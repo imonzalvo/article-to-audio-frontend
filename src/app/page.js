@@ -86,7 +86,6 @@ export default function Home() {
 
       while (true) {
         const { done, value } = await reader.read();
-        console.log("chunks", value, buffer);
 
         if (done) {
           // Process any remaining data in the buffer
