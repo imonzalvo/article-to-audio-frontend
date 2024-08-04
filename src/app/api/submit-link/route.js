@@ -67,6 +67,7 @@ export async function POST(req) {
         const reader = response.body.getReader();
         while (true) {
           const { done, value } = await reader.read();
+          console.log("reader", value)
           if (done) break;
           controller.enqueue(value);
         }
@@ -83,7 +84,7 @@ export async function POST(req) {
       }
     },
   });
-  
+
   return new Response(stream, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
