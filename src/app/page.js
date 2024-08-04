@@ -88,6 +88,7 @@ export default function Home() {
         if (done) break;
 
         const chunk = decoder.decode(value);
+        console.log("chunk", chunk)
         const updates = chunk.split("\n").filter(Boolean).map(JSON.parse);
 
         updates.forEach((update) => {
