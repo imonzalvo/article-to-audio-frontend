@@ -32,7 +32,7 @@ export async function GET() {
       console.error("Error fetching audio keys:", errorData);
 
       if (response.status === 401) {
-        // Token is invalid or expired
+        // Token is invalid or expired 
         return NextResponse.json(
           { error: "Authentication failed", signOut: true },
           { status: 401 }
