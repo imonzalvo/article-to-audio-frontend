@@ -90,6 +90,8 @@ export default function Home() {
         if (done) {
           // Process any remaining data in the buffer
           if (buffer) {
+            console.log("chunks", value, buffer);
+
             processUpdate(buffer);
           }
           break;
