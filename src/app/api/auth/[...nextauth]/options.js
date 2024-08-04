@@ -13,7 +13,7 @@ export const authOptions = {
       if (account?.provider === "google") {
         try {
           const response = await fetch(
-            "http://localhost:3001/auth/google/callback",
+            `${process.env.API_BASE_URL}/auth/google/callback`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

@@ -35,14 +35,17 @@ export async function POST(req) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const response = await fetch("http://localhost:3001/articles/scrape", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ url }),
-        });
+        const response = await fetch(
+          `${process.env.API_BASE_URL}/articles/scrape`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ url }),
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
