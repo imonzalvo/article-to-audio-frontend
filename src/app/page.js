@@ -82,20 +82,45 @@ export default function Home() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        console.log("chunk", chunk)
-        const updates = chunk.split("\n").filter(Boolean).map(JSON.parse);
+        buffer += decoder.decode(value, { stream: true });
 
-        updates.forEach((update) => {
+        console.log("Received chunk:", buffer); // Log the received chunk
+
+        let newlineIndex;
+        while ((newlineIndex = buffer.indexOf("\n")) >= 0) {
+          const line = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
+
+          console.log("Processing line:", line); // Log the line being processed
+
+          try {
+            const update = JSON.parse(line);
+            if (update.progress) setProgress(update.progress);
+            if (update.message) setProgressMessage(update.message);
+            if (update.error) throw new Error(update.error);
+          } catch (e) {
+            console.error("Error parsing JSON:", e, "Line:", line);
+          }
+        }
+      }
+
+      // Process any remaining data in the buffer
+      if (buffer.trim()) {
+        console.log("Processing remaining buffer:", buffer); // Log any remaining data
+        try {
+          const update = JSON.parse(buffer);
           if (update.progress) setProgress(update.progress);
           if (update.message) setProgressMessage(update.message);
           if (update.error) throw new Error(update.error);
-        });
+        } catch (e) {
+          console.error("Error parsing JSON:", e, "Buffer:", buffer);
+        }
       }
 
       fetchAudioFiles();
