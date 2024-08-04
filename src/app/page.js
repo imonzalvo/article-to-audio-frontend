@@ -89,16 +89,16 @@ export default function Home() {
 
         const chunk = decoder.decode(value);
         console.log("chunk", chunk, value)
-        const updates = chunk.split("\n").filter(Boolean).map(JSON.parse);
+        // const updates = chunk.split("\n").filter(Boolean).map(JSON.parse);
 
-        updates.forEach((update) => {
-          if (update.progress) setProgress(update.progress);
-          if (update.message) setProgressMessage(update.message);
-          if (update.error) throw new Error(update.error);
-        });
+        // updates.forEach((update) => {
+        //   if (update.progress) setProgress(update.progress);
+        //   if (update.message) setProgressMessage(update.message);
+        //   if (update.error) throw new Error(update.error);
+        // });
       }
 
-      fetchAudioFiles();
+      // fetchAudioFiles();
     } catch (error) {
       console.error("Error converting article:", error);
       setError(
