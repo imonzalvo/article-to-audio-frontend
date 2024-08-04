@@ -52,6 +52,7 @@ export async function POST(req) {
 
         if (!response.ok) {
           const errorData = await response.json();
+          console.log("error response stream", errorData)
           controller.enqueue(
             encoder.encode(
               JSON.stringify({
@@ -66,12 +67,15 @@ export async function POST(req) {
 
         const reader = response.body.getReader();
         while (true) {
+          console.log("while true")
+
           const { done, value } = await reader.read();
           console.log("reader", value)
           if (done) break;
           controller.enqueue(value);
         }
       } catch (error) {
+        console.log("inside catch", error)
         controller.enqueue(
           encoder.encode(
             JSON.stringify({
