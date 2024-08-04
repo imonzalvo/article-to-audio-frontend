@@ -9,7 +9,6 @@ export default function SignInButton() {
 
   useEffect(() => {
     if (session?.accessToken) {
-      console.log(session)
       localStorage.setItem('jwtToken', session.accessToken);
     }
   }, [session]);

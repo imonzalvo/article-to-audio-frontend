@@ -9,6 +9,7 @@ import SignInButton from "../components/signInButton";
 import Header from "../components/header";
 import { signOut } from "next-auth/react";
 import Spinner from "../components/Spinner";
+import { Headphones, BookOpen, Zap, ExternalLink } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -41,7 +42,6 @@ export default function Home() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      console.log("Fetched audio files:", data);
       if (Array.isArray(data)) {
         setAudioFiles(data);
       } else if (data.error) {
@@ -53,6 +53,11 @@ export default function Home() {
       console.error("Error fetching audio files:", error);
       setError("Failed to fetch audio files. Please try again later.");
     }
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    localStorage.removeItem("jwtToken");
   };
 
   const handleLinkSubmit = async (link) => {
@@ -105,9 +110,73 @@ export default function Home() {
     }
   };
 
+  const LoggedOutContent = () => (
+    <div className="max-w-4xl mx-auto text-center">
+      <h1 className="text-4xl font-bold mb-6">Welcome to Article to Podcast</h1>
+      <p className="text-xl mb-8">
+        Transform your favorite articles into engaging audio content. Listen on
+        the go!
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <FeatureCard
+          icon={<BookOpen className="w-12 h-12 text-blue-500" />}
+          title="Easy Conversion"
+          description="Simply paste an article link, and we'll convert it to audio."
+        />
+        <FeatureCard
+          icon={<Headphones className="w-12 h-12 text-blue-500" />}
+          title="Listen Anywhere"
+          description="Access your audio articles on any device, anytime."
+        />
+        <FeatureCard
+          icon={<Zap className="w-12 h-12 text-blue-500" />}
+          title="Save Time"
+          description="Consume content faster by listening instead of reading."
+        />
+      </div>
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Ready to get started?</h2>
+        <SignInButton />
+      </div>
+      <div className="bg-gray-100 p-6 rounded-lg">
+        <div className="flex flex-row justify-center align-middle mb-4">
+          <h3 className="text-xl font-semibold mr-2">Try a sample audio</h3>
+          <a
+            href="https://austenangell.substack.com/p/artificial-intelligence-promise-and"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm inline-flex items-center text-blue-600 hover:text-blue-800"
+          >
+            Read article <ExternalLink className="ml-1 w-4 h-4" />
+          </a>
+        </div>
+        <div className="max-w-md mx-auto">
+          <AudioPlayer
+            audio={{
+              title: "Artificial Intelligence: Promise and Peril",
+              url: "https://article-to-audio.s3.amazonaws.com/test/1cf98a68-3cc4-4e13-925c-2e17a351fd58.mp3",
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const FeatureCard = ({ icon, title, description }) => (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="flex justify-center mb-4">{icon}</div>
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Header userName={session?.user?.name} />
+      <Header
+        userName={session?.user?.name}
+        onLogout={handleSignOut}
+        isLoggedIn={status === "authenticated"}
+      />
       <main className="flex-grow container mx-auto px-4 py-8">
         {status === "loading" ? (
           <div className="flex justify-center items-center h-full">
@@ -140,15 +209,7 @@ export default function Home() {
             </div>
           </>
         ) : (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">
-              Welcome to Article to Podcast
-            </h2>
-            <p className="mb-4">
-              Please sign in to access the audio conversion feature.
-            </p>
-            <SignInButton />
-          </div>
+          <LoggedOutContent />
         )}
       </main>
     </div>

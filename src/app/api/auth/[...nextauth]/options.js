@@ -24,7 +24,6 @@ export const authOptions = {
             }
           );
           const data = await response.json();
-          console.log("dataaaa", data)
           if (data.success) {
             // We'll handle token storage on the client side
             account.accessToken = data.token;
