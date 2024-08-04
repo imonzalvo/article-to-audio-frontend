@@ -88,14 +88,19 @@ export default function Home() {
         if (done) break;
 
         const chunk = decoder.decode(value);
-        console.log("chunk", chunk, value)
-        const updates = chunk.split("\n").filter(Boolean).map(JSON.parse);
+        const updates = chunk.split("\n").filter(Boolean);
 
-        updates.forEach((update) => {
-          if (update.progress) setProgress(update.progress);
-          if (update.message) setProgressMessage(update.message);
-          if (update.error) throw new Error(update.error);
-        });
+        console.log("chunks", chunk, updates)
+        for (const update of updates) {
+          try {
+            const parsedUpdate = JSON.parse(update);
+            if (parsedUpdate.progress) setProgress(parsedUpdate.progress);
+            if (parsedUpdate.message) setProgressMessage(parsedUpdate.message);
+            if (parsedUpdate.error) throw new Error(parsedUpdate.error);
+          } catch (error) {
+            console.error("Error parsing JSON:", error, "Raw update:", update);
+          }
+        }
       }
 
       fetchAudioFiles();
