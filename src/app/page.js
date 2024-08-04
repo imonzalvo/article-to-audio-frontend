@@ -123,7 +123,7 @@ export default function Home() {
       const parsedUpdate = JSON.parse(update);
       console.log("Processed update:", parsedUpdate); // For debugging
       if (parsedUpdate.progress) setProgress(parsedUpdate.progress);
-      if (parsedUpdate.message) setProgressMessage(parsedUpdate.message);
+      // if (parsedUpdate.message) setProgressMessage(parsedUpdate.message);
       if (parsedUpdate.error) throw new Error(parsedUpdate.error);
     } catch (error) {
       console.error("Error processing update:", error, "Raw update:", update);
