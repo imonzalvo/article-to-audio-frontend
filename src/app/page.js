@@ -82,23 +82,30 @@ export default function Home() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
 
-        const chunk = decoder.decode(value);
-        console.log("chunk", chunk, value)
-        // const updates = chunk.split("\n").filter(Boolean).map(JSON.parse);
+        if (done) {
+          // Process any remaining data in the buffer
+          if (buffer) {
+            processUpdate(buffer);
+          }
+          break;
+        }
 
-        // updates.forEach((update) => {
-        //   if (update.progress) setProgress(update.progress);
-        //   if (update.message) setProgressMessage(update.message);
-        //   if (update.error) throw new Error(update.error);
-        // });
+        buffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex;
+        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+          const update = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
+          processUpdate(update);
+        }
       }
 
-      // fetchAudioFiles();
+      await fetchAudioFiles();
     } catch (error) {
       console.error("Error converting article:", error);
       setError(
@@ -108,6 +115,18 @@ export default function Home() {
       setIsSubmitting(false);
       setProgress(0);
       setProgressMessage("");
+    }
+  };
+
+  const processUpdate = (update) => {
+    try {
+      const parsedUpdate = JSON.parse(update);
+      console.log("Processed update:", parsedUpdate); // For debugging
+      if (parsedUpdate.progress) setProgress(parsedUpdate.progress);
+      if (parsedUpdate.message) setProgressMessage(parsedUpdate.message);
+      if (parsedUpdate.error) throw new Error(parsedUpdate.error);
+    } catch (error) {
+      console.error("Error processing update:", error, "Raw update:", update);
     }
   };
 
