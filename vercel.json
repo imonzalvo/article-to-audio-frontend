@@ -1,7 +1,0 @@
-{
-    "functions": {
-        "app/api/submit-link/route.js": {
-            "runtime": "nodejs18.x"
-        }
-    }
-}
