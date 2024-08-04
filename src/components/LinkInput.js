@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-export default function LinkInput({ onSubmit }) {
+export default function LinkInput({ onSubmit, disabled }) {
   const [link, setLink] = useState("");
 
   const handleSubmit = (e) => {
@@ -11,20 +13,16 @@ export default function LinkInput({ onSubmit }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
+      <Input
         type="url"
         value={link}
         onChange={(e) => setLink(e.target.value)}
         placeholder="Enter article URL"
-        className="flex-grow p-2 border rounded"
         required
       />
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
+      <Button type="submit" disabled={disabled}>
         Convert
-      </button>
+      </Button>
     </form>
   );
 }

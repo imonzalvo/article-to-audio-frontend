@@ -3,8 +3,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/options";
 
 export async function POST(req) {
-  console.log("here?? 111111");
-
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -33,34 +31,54 @@ export async function POST(req) {
 
   const { url } = body;
 
-  try {
-    const response = await fetch("http://localhost:3001/articles/scrape", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ url }),
-    });
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        const response = await fetch("http://localhost:3001/articles/scrape", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ url }),
+        });
 
-    console.log("response??", response);
+        if (!response.ok) {
+          const errorData = await response.json();
+          controller.enqueue(
+            encoder.encode(
+              JSON.stringify({
+                error:
+                  errorData.message || `HTTP error! status: ${response.status}`,
+              }) + "\n"
+            )
+          );
+          controller.close();
+          return;
+        }
 
-    if (!response.ok) {
-      // Handle response errors
-      const errorData = await response.json();
-      console.error("Error fetching audio keys:", errorData);
-      return NextResponse.json(
-        { error: "Failed to fetch audio keys" },
-        { status: response.status }
-      );
-    }
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error converting article:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+        const reader = response.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          controller.enqueue(value);
+        }
+      } catch (error) {
+        controller.enqueue(
+          encoder.encode(
+            JSON.stringify({
+              error: error.message || "Internal Server Error",
+            }) + "\n"
+          )
+        );
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
 }

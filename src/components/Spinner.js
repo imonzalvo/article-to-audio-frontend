@@ -1,7 +1,11 @@
-const Spinner = () => (
-  <div className="flex justify-center items-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-);
+import { Loader2 } from "lucide-react"
 
-export default Spinner;
+const Spinner = () => {
+  return (
+    <div className="flex justify-center items-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  )
+}
+
+export default Spinner

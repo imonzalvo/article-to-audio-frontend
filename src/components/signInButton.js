@@ -2,13 +2,13 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect } from 'react';
+import { Button } from "@/components/ui/button";
 
 export default function SignInButton() {
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.accessToken) {
-      // Store the token in localStorage
       console.log(session)
       localStorage.setItem('jwtToken', session.accessToken);
     }
@@ -25,11 +25,11 @@ export default function SignInButton() {
 
   if (session) {
     return (
-      <>
-        Signed in as {session.user?.email} <br />
-        <button onClick={handleSignOut}>Sign out</button>
-      </>
+      <div className="flex flex-col items-center gap-2">
+        <p>Signed in as {session.user?.email}</p>
+        <Button variant="outline" onClick={handleSignOut}>Sign out</Button>
+      </div>
     );
   }
-  return <button onClick={handleSignIn}>Sign in with Google</button>;
+  return <Button onClick={handleSignIn}>Sign in with Google</Button>;
 }

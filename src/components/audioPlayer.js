@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 
 const AudioPlayer = ({ audio }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -91,53 +94,62 @@ const AudioPlayer = ({ audio }) => {
   }
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md w-full max-w-md h-fit">
+    <Card className="w-full max-w-md h-fit">
       <audio ref={audioRef} />
       {audio?.title && (
-        <h3 className="text-wrap text-lg font-semibold mb-4">{audio.title}</h3>
+        <CardHeader>
+          <CardTitle>{audio.title}</CardTitle>
+        </CardHeader>
       )}
-      <div className="flex items-center justify-between mb-4">
-        <button
-          onClick={togglePlay}
-          className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
-          disabled={isLoading}
-        >
-          {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-        </button>
-        <button
-          onClick={restartAudio}
-          className="bg-gray-300 p-2 rounded-full hover:bg-gray-400 transition-colors"
-          disabled={isLoading}
-        >
-          <RotateCcw size={24} />
-        </button>
-        <button
-          onClick={toggleMute}
-          className="bg-gray-300 p-2 rounded-full hover:bg-gray-400 transition-colors"
-          disabled={isLoading}
-        >
-          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-        </button>
-      </div>
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-600">{formatTime(currentTime)}</span>
-        <input
-          type="range"
-          min="0"
-          max={duration}
-          value={currentTime}
-          onChange={(e) => {
-            const time = parseFloat(e.target.value);
-            setCurrentTime(time);
-            audioRef.current.currentTime = time;
-          }}
-          className="w-full"
-          disabled={isLoading}
-        />
-        <span className="text-sm text-gray-600">{formatTime(duration)}</span>
-      </div>
-      {isLoading && !!audio  && <div className="text-center mt-2">Loading audio...</div>}
-    </div>
+      <CardContent>
+        <div className="flex items-center justify-between mb-2 pt-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={togglePlay}
+            disabled={isLoading}
+          >
+            {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={restartAudio}
+            disabled={isLoading}
+          >
+            <RotateCcw size={24} />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleMute}
+            disabled={isLoading}
+          >
+            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-600 mr-2">
+            {formatTime(currentTime)}
+          </span>
+          <Slider
+            min={0}
+            max={duration}
+            value={[currentTime]}
+            onValueChange={(value) => {
+              const time = value[0];
+              setCurrentTime(time);
+              audioRef.current.currentTime = time;
+            }}
+            disabled={isLoading}
+          />
+          <span className="text-sm text-gray-600">{formatTime(duration)}</span>
+        </div>
+        {isLoading && !!audio && (
+          <div className="text-center mt-2">Loading audio...</div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
