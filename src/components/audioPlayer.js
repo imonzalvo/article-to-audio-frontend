@@ -1,8 +1,7 @@
-"use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
 
-const AudioPlayer = ({ audioUrl }) => {
+const AudioPlayer = ({ audio }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -14,10 +13,7 @@ const AudioPlayer = ({ audioUrl }) => {
   useEffect(() => {
     const fetchAudioUrl = async () => {
       try {
-        // const response = await fetch(
-        //   "https://article-to-audio.s3.amazonaws.com/test/838cf480-bb53-4838-83a4-8d9a6d86c390.mp3"
-        // );
-        const response = await fetch(audioUrl);
+        const response = await fetch(audio.url);
         if (!response.ok) {
           throw new Error("Failed to fetch audio URL");
         }
@@ -34,8 +30,10 @@ const AudioPlayer = ({ audioUrl }) => {
       }
     };
 
-    fetchAudioUrl();
-  }, [audioUrl]);
+    if(!!audio) {
+      fetchAudioUrl();
+    }
+  }, [audio]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -93,8 +91,11 @@ const AudioPlayer = ({ audioUrl }) => {
   }
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md max-w-md mx-auto">
+    <div className="bg-gray-100 p-4 rounded-lg shadow-md w-full max-w-md h-fit">
       <audio ref={audioRef} />
+      {audio?.title && (
+        <h3 className="text-wrap text-lg font-semibold mb-4">{audio.title}</h3>
+      )}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={togglePlay}
@@ -135,7 +136,7 @@ const AudioPlayer = ({ audioUrl }) => {
         />
         <span className="text-sm text-gray-600">{formatTime(duration)}</span>
       </div>
-      {isLoading && <div className="text-center mt-2">Loading audio...</div>}
+      {isLoading && !!audio  && <div className="text-center mt-2">Loading audio...</div>}
     </div>
   );
 };

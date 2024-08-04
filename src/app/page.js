@@ -8,18 +8,19 @@ import AudioPlayer from "../components/audioPlayer";
 import SignInButton from "../components/signInButton";
 import Header from "../components/header";
 import { signOut } from "next-auth/react";
+import Spinner from "../components/Spinner"; // Import the new Spinner component
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [audioFiles, setAudioFiles] = useState([]);
   const [selectedAudio, setSelectedAudio] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (session) {
+    if (status === "authenticated") {
       fetchAudioFiles();
     }
-  }, [session]);
+  }, [status]);
 
   const fetchAudioFiles = async () => {
     try {
@@ -28,25 +29,13 @@ export default function Home() {
       const data = await response.json();
 
       if (response.status === 401 && data.signOut) {
-        // Token is invalid, sign out the user
         await signOut({ redirect: false });
-        localStorage.removeItem('jwtToken');
-        // Redirect to login page or show a message
+        localStorage.removeItem("jwtToken");
         return;
       }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      if (response.status === 401 && data.signOut) {
-        console.log("sign out??")
-        // Token is invalid, sign out the user
-        await signOut({ redirect: false });
-        localStorage.removeItem('jwtToken');
-        // Redirect to login page or show a message
-        // router.push('/login');
-        return;
       }
 
       console.log("Fetched audio files:", data);
@@ -63,13 +52,12 @@ export default function Home() {
     }
   };
 
-
   const handleLinkSubmit = async (link) => {
     try {
       setError(null);
-      const response = await fetch('/api/submit-link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/submit-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: link }),
       });
       if (!response.ok) {
@@ -82,7 +70,7 @@ export default function Home() {
         throw new Error(data.error);
       }
     } catch (error) {
-      console.error('Error converting article:', error);
+      console.error("Error converting article:", error);
       setError("Failed to convert article. Please try again later.");
     }
   };
@@ -91,24 +79,26 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        {session ? (
+        {status === "loading" ? (
+          <div className="flex justify-center items-center h-full">
+            <Spinner />
+          </div>
+        ) : status === "authenticated" ? (
           <>
             <LinkInput onSubmit={handleLinkSubmit} />
-            {error && (
-              <div className="text-red-500 mt-4">{error}</div>
-            )}
+            {error && <div className="text-red-500 mt-4">{error}</div>}
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <AudioPlayer audio={selectedAudio} />
               <AudioList
                 audioFiles={audioFiles}
                 onSelect={(audio) => setSelectedAudio(audio)}
               />
-              {selectedAudio && <AudioPlayer audioUrl={selectedAudio.url} />}
             </div>
           </>
         ) : (
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">
-              Welcome to Article to Audio
+              Welcome to Article to Podcast
             </h2>
             <p className="mb-4">
               Please sign in to access the audio conversion feature.
