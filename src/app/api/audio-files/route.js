@@ -28,11 +28,9 @@ export async function GET() {
     if (!response.ok) {
       // Handle response errors
       const errorData = await response.json();
-      console.log("errorrrr")
 
       console.error("Error fetching audio keys:", errorData);
 
-      console.log("errorrrr", response.status)
       if (response.status === 401) {
         // Token is invalid or expired
         return NextResponse.json(
@@ -48,7 +46,6 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log("Response data:", data);
 
     return NextResponse.json(data);
   } catch (error) {
