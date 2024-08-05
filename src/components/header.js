@@ -10,11 +10,11 @@ export default function Header({ userName, onLogout, isLoggedIn }) {
         <div className="container mx-auto flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white">ListenStack</h1>
           <div className="flex items-center space-x-4">
-            {userName && (
+            {/* {userName && (
               <p className="font-mono text-white">{`Hola, ${
                 userName.split(" ")[0]
               }`}</p>
-            )}
+            )} */}
             {isLoggedIn && (
               <Button
                 variant="outline"
