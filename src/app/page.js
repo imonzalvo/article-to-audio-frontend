@@ -133,9 +133,9 @@ export default function Home() {
 
   const LoggedOutContent = () => (
     <div className="max-w-4xl mx-auto text-center">
-      <h1 className="text-4xl font-bold mb-6">Welcome to Article to Podcast</h1>
+      <h1 className="text-4xl font-bold mb-6">Welcome to ListenStack</h1>
       <p className="text-xl mb-8">
-        Transform your favorite articles into engaging audio content. Listen on
+        Transform your favorite substack articles into engaging audio content. Listen on
         the go!
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
@@ -159,7 +159,7 @@ export default function Home() {
         <h2 className="text-2xl font-semibold mb-4">Ready to get started?</h2>
         <SignInButton />
       </div>
-      <div className="bg-gray-100 p-6 rounded-lg">
+      <div className="bg-gray-100 p-6 pt-0 rounded-lg">
         <div className="flex flex-row justify-center align-middle mb-4">
           <h3 className="text-xl font-semibold mr-2">Try a sample audio</h3>
           <a
