@@ -75,6 +75,7 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.log("gola?? error", errorData);
         throw new Error(
           errorData.error || `HTTP error! status: ${response.status}`
         );
@@ -90,7 +91,6 @@ export default function Home() {
         if (done) {
           // Process any remaining data in the buffer
           if (buffer) {
-
             processUpdate(buffer);
           }
           break;
@@ -102,11 +102,11 @@ export default function Home() {
         while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
           const update = buffer.slice(0, newlineIndex);
           buffer = buffer.slice(newlineIndex + 1);
-          processUpdate(update);
+          await processUpdate(update);
         }
       }
 
-      await fetchAudioFiles();
+      // await fetchAudioFiles();
     } catch (error) {
       console.error("Error converting article:", error);
       setError(
@@ -119,13 +119,17 @@ export default function Home() {
     }
   };
 
-  const processUpdate = (update) => {
+  const processUpdate = async (update) => {
     try {
       const parsedUpdate = JSON.parse(update);
       console.log("Processed update:", parsedUpdate); // For debugging
       if (parsedUpdate.progress) setProgress(parsedUpdate.progress);
-      // if (parsedUpdate.message) setProgressMessage(parsedUpdate.message);
-      if (parsedUpdate.error) throw new Error(parsedUpdate.error);
+      if (parsedUpdate.message) setProgressMessage(parsedUpdate.message);
+      if (parsedUpdate.error) {
+        setError(parsedUpdate.error);
+        throw new Error(parsedUpdate.error);
+      }
+      await fetchAudioFiles();
     } catch (error) {
       console.error("Error processing update:", error, "Raw update:", update);
     }
@@ -135,8 +139,8 @@ export default function Home() {
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-4xl font-bold mb-6">Welcome to ListenStack</h1>
       <p className="text-xl mb-8">
-        Transform your favorite substack articles into engaging audio content. Listen on
-        the go!
+        Transform your favorite substack articles into engaging audio content.
+        Listen on the go!
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         <FeatureCard
